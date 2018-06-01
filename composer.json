@@ -7,11 +7,11 @@
     "scraper"
   ],
   "type": "library",
-  "homepage": "https://github.com/Shilza/instagram-php-scraper",
+  "homepage": "https://github.com/raiym/instagram-php-scraper",
   "license": "MIT",
   "authors": [
     {
-      "name": "shilza",
+      "name": "raiym",
       "email": "r.kapishev@gmail.com"
     }
   ],
