@@ -1,6 +1,7 @@
 {
   "name": "shilza/instagram-php-scraper",
   "description": "Instagram PHP Scraper. Get account information, photos and videos without any authorization",
+  "version": "master",
   "keywords": [
     "instagram",
     "scraper"
