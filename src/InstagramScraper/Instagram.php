@@ -1215,7 +1215,8 @@ class Instagram
                 ['username' => $this->sessionUsername, 'password' => $this->sessionPassword]);
 
             if ($response->code !== 200) {
-                if ($response->code === 400 && isset($response->body->message) && $response->body->message == 'checkpoint_required' && $support_two_step_verification) {
+                if ($response->code === 400 && isset($response->body->message)
+                    && $response->body->message == 'checkpoint_required' && $support_two_step_verification) {
                     $response = $this->verifyTwoStep($response, $cookies);
                 } elseif ((is_string($response->code) || is_numeric($response->code)) && is_string($response->body)) {
                     throw new InstagramAuthException('Response code is ' . $response->code . '. Body: ' . $response->body . ' Something went wrong. Please report issue.');
@@ -1392,5 +1393,80 @@ class Instagram
         }
 
         return self::extractSharedDataFromBody($response->raw_body);
+    }
+
+
+    public function like($media = ""){
+        if ($media !== "") {
+            $response = Request::post(Endpoints::getMediaLikeUrl((ctype_digit($media)
+                ? $media
+                : strval($this->getMediaByUrl($media)->getId()))),
+                $this->generateHeaders($this->userSession));
+
+            if($response->code != 200)
+                throw new InstagramException('Response code is ' . $response->code . '. Body: '
+                    . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+        }
+    }
+
+    public function unlike($media = ""){
+        if ($media !== "") {
+            $response = Request::post(Endpoints::getMediaUnlikeUrl((ctype_digit($media)
+                ? $media
+                : strval($this->getMediaByUrl($media)->getId()))),
+                $this->generateHeaders($this->userSession));
+
+            if($response->code != 200)
+                throw new InstagramException('Response code is ' . $response->code . '. Body: '
+                    . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+        }
+    }
+
+    public function follow($account = ""){
+        if ($account !== "") {
+            $response = Request::post(Endpoints::getFollowUrl((ctype_digit($account)
+                    ? $account
+                    : strval($this->getAccount($account)->getId()))),
+                $this->generateHeaders($this->userSession));
+
+            if($response->code != 200)
+                throw new InstagramException('Response code is ' . $response->code . '. Body: '
+                    . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+        }
+    }
+
+    public function unfollow($account = ""){
+        if ($account !== "") {
+            $response = Request::post(Endpoints::getUnfollowUrl((ctype_digit($account)
+                ? $account
+                : strval($this->getAccount($account)->getId()))),
+                $this->generateHeaders($this->userSession));
+
+            if($response->code != 200)
+                throw new InstagramException('Response code is ' . $response->code . '. Body: '
+                    . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+        }
+    }
+
+    public function comment($media = "", $text = ""){
+        if($media !== "" && $text !== ""){
+            $mediaId = (ctype_digit($media)
+                ? $media
+                : strval($this->getMediaByUrl($media)->getId()));
+
+
+            $response = Request::post(Endpoints::getCommentUrl($mediaId),
+                $this->generateHeaders($this->userSession),
+                ['comment_text' => $text]);
+
+            if($response->code != 200)
+                throw new InstagramException('Response code is ' . $response->code . '. Body: '
+                    . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+
+            $body = json_decode($response->raw_body, true);
+            $comment = new Comment($body['id'], $text, $body['created_time'], $body['from']['id'], $mediaId);
+            var_dump($comment);
+            return $comment;
+        }
     }
 }

@@ -84,4 +84,16 @@ class Comment extends AbstractModel
         }
     }
 
+
+    ////
+
+    protected $picId;
+
+    function __construct($id = "", $text = "", $createdAt = "", $owner = "", $picId = ""){
+        $this->id = $id;
+        $this->text = $text;
+        $this->createdAt = $createdAt;
+        $this->owner = $owner;
+        $this->picId = $picId;
+    }
 }

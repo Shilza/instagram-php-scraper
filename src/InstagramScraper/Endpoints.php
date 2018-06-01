@@ -35,6 +35,11 @@ class Endpoints
 
     const GRAPH_QL_QUERY_URL = 'https://www.instagram.com/graphql/query/?query_id={{queryId}}';
 
+    /////////////////////////////////
+    const MEDIA_LIKE_URL = 'https://www.instagram.com/web/likes/{{mediaId}}/like/';
+    const MEDIA_UNLIKE_URL = 'https://www.instagram.com/web/likes/{{mediaId}}/unlike/';
+    const COMMENT_URL = 'https://www.instagram.com/web/comments/{{mediaId}}/add/';
+
     private static $requestMediaCount = 30;
 
     /**
@@ -140,6 +145,12 @@ class Endpoints
         return $url;
     }
 
+    public static function getUnfollowUrl($accountId)
+    {
+        $url = str_replace('{{accountId}}', urlencode($accountId), static::UNFOLLOW_URL);
+        return $url;
+    }
+
     public static function getFollowersJsonLink($accountId, $count, $after = '')
     {
         $url = str_replace('{{accountId}}', urlencode($accountId), static::FOLLOWERS_URL);
@@ -178,5 +189,17 @@ class Endpoints
     {
         $url = self::getGraphQlUrl(InstagramQueryId::STORIES, ['variables' => json_encode($variables)]);
         return $url;
+    }
+
+    public static function getMediaLikeUrl($mediaId){
+        return str_replace('{{mediaId}}', $mediaId, static::MEDIA_LIKE_URL);
+    }
+
+    public static function getMediaUnlikeUrl($mediaId){
+        return str_replace('{{mediaId}}', $mediaId, static::MEDIA_UNLIKE_URL);
+    }
+
+    public static function getCommentUrl($mediaId){
+        return str_replace('{{mediaId}}', $mediaId, static::COMMENT_URL);
     }
 }
