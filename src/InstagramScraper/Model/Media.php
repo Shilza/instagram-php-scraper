@@ -116,6 +116,11 @@ class Media extends AbstractModel
     protected $ownerId = 0;
 
     /**
+     * @var bool
+     */
+    protected $likedByViewer = false;
+
+    /**
      * @var int
      */
     protected $likesCount = 0;
@@ -129,6 +134,12 @@ class Media extends AbstractModel
      * @var string
      */
     protected $locationName = '';
+
+    /**
+     * @var bool
+     */
+    protected $commentDisable = false;
+
 
     /**
      * @var string
@@ -398,6 +409,13 @@ class Media extends AbstractModel
     /**
      * @return bool
      */
+    public function isCommentDisable(){
+        return $this->commentDisable;
+    }
+
+    /**
+     * @return bool
+     */
     public function hasMoreComments()
     {
         return $this->hasMoreComments;
@@ -419,6 +437,14 @@ class Media extends AbstractModel
         return $this->sidecarMedias;
     }
 
+
+    /**
+     * @return bool
+     */
+    public function isLikedByViewer()
+    {
+        return $this->likedByViewer;
+    }
     /**
      * @param $value
      * @param $prop
@@ -559,8 +585,14 @@ class Media extends AbstractModel
                     $this->commentsNextPage = (string) $arr[$prop]['page_info']['end_cursor'];
                 }
                 break;
+            case 'comments_disabled':
+                $this->commentDisable = $value;
+                break;
             case 'edge_media_preview_like':
                 $this->likesCount = $arr[$prop]['count'];
+                break;
+            case 'viewer_has_liked':
+                $this->likedByViewer = $value;
                 break;
             case 'edge_liked_by':
                 $this->likesCount = $arr[$prop]['count'];

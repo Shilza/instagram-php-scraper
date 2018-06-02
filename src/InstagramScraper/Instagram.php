@@ -27,6 +27,8 @@ class Instagram
     const PAGING_TIME_LIMIT_SEC = 1800; // 30 mins time limit on operations that require multiple requests
     const PAGING_DELAY_MINIMUM_MICROSEC = 1000000; // 1 sec min delay to simulate browser
     const PAGING_DELAY_MAXIMUM_MICROSEC = 3000000; // 3 sec max delay to simulate browser
+    const FOLLOWS_QUERY_HASH = '58712303d941c6855d4e888c5f0cd22f';
+    const FOLLOWERS_QUERY_HASH = '37479f2b8209594dde7facb0d904896a';
 
     /** @var ExtendedCacheItemPoolInterface $instanceCache */
     private static $instanceCache;
@@ -735,9 +737,9 @@ class Instagram
      * @throws InstagramException
      * @throws InstagramNotFoundException
      */
-    public function getUsernameById($id)
-    {
-        $response = Request::get(Endpoints::getAccountJsonPrivateInfoLinkByAccountId($id), $this->generateHeaders($this->userSession));
+    public function getUsernameById($id){
+        $response = Request::get(Endpoints::getAccountJsonPrivateInfoLinkByAccountId($id),
+            $this->generateHeaders($this->userSession));
 
         if (static::HTTP_NOT_FOUND === $response->code) {
             throw new InstagramNotFoundException('Account with given username does not exist.');
@@ -1019,7 +1021,8 @@ class Instagram
 
         while (true) {
             $response = Request::get(Endpoints::getFollowersJsonLink($accountId, $pageSize, $endCursor),
-                $this->generateHeaders($this->userSession));
+                $this->generateHeaders($this->userSession),
+                ['query_hash' => static::FOLLOWERS_QUERY_HASH]);
             if ($response->code !== 200) {
                 throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
             }
@@ -1084,7 +1087,8 @@ class Instagram
 
         while (true) {
             $response = Request::get(Endpoints::getFollowingJsonLink($accountId, $pageSize, $endCursor),
-                $this->generateHeaders($this->userSession));
+                $this->generateHeaders($this->userSession),
+                ['query_hash' => static::FOLLOWS_QUERY_HASH]);
             if ($response->code !== 200) {
                 throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
             }
@@ -1464,9 +1468,7 @@ class Instagram
                     . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
 
             $body = json_decode($response->raw_body, true);
-            $comment = new Comment($body['id'], $text, $body['created_time'], $body['from']['id'], $mediaId);
-            var_dump($comment);
-            return $comment;
+            return new Comment($body['id'], $text, $body['created_time'], $body['from']['id'], $mediaId);
         }
     }
 }

@@ -86,8 +86,14 @@ class Comment extends AbstractModel
 
 
     ////
-
     protected $picId;
+
+    /**
+     * @return string
+     */
+    public function getPicId(){
+        return $this->picId;
+    }
 
     function __construct($id = "", $text = "", $createdAt = "", $owner = "", $picId = ""){
         $this->id = $id;
