@@ -30,7 +30,9 @@ class Instagram
     const FOLLOWS_QUERY_HASH = '58712303d941c6855d4e888c5f0cd22f';
     const FOLLOWERS_QUERY_HASH = '37479f2b8209594dde7facb0d904896a';
 
-    /** @var ExtendedCacheItemPoolInterface $instanceCache */
+    /** @var ExtendedCacheItemPoolIn
+     *terface $instanceCache
+     */
     private static $instanceCache;
 
     public $pagingTimeLimitSec = self::PAGING_TIME_LIMIT_SEC;
@@ -357,7 +359,8 @@ class Instagram
                 'after' => (string) $maxId
             ]);
 
-            $response = Request::get(Endpoints::getAccountMediasJsonLink($variables), $this->generateHeaders($this->userSession, $this->generateGisToken($variables)));
+            $response = Request::get(Endpoints::getAccountMediasJsonLink($variables), $this->generateHeaders(null,
+                $this->generateGisToken($variables)));
 
             if (static::HTTP_OK !== $response->code) {
                 throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
@@ -777,7 +780,7 @@ class Instagram
         $hasNextPage = true;
         while ($index < $count && $hasNextPage) {
             $response = Request::get(Endpoints::getMediasJsonByTagLink($tag, $maxId),
-                $this->generateHeaders($this->userSession));
+               null);
             if ($response->code !== 200) {
                 throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
             }
@@ -1020,11 +1023,19 @@ class Instagram
         }
 
         while (true) {
+
+            $variables = json_encode([
+                'id' => (string) $accountId,
+                'first' => (string) $count,
+                'after' => (string) $endCursor
+            ]);
+
             $response = Request::get(Endpoints::getFollowersJsonLink($accountId, $pageSize, $endCursor),
-                $this->generateHeaders($this->userSession),
+                $this->generateHeaders($this->userSession, $this->generateGisToken($variables)),
                 ['query_hash' => static::FOLLOWERS_QUERY_HASH]);
             if ($response->code !== 200) {
-                throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+                throw new InstagramException('Response code is ' . $response->code . '. Body: '
+                    . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
             }
 
             $jsonResponse = json_decode($response->raw_body, true, 512, JSON_BIGINT_AS_STRING);
@@ -1067,7 +1078,6 @@ class Instagram
      * @param int $count Total followed accounts to retrieve
      * @param int $pageSize Internal page size for pagination
      * @param bool $delayed Use random delay between requests to mimic browser behaviour
-     *
      * @return array
      * @throws InstagramException
      */
@@ -1086,11 +1096,19 @@ class Instagram
         }
 
         while (true) {
+
+            $variables = json_encode([
+                'id' => (string) $accountId,
+                'first' => (string) $count,
+                'after' => (string) $endCursor
+            ]);
+
             $response = Request::get(Endpoints::getFollowingJsonLink($accountId, $pageSize, $endCursor),
-                $this->generateHeaders($this->userSession),
+                $this->generateHeaders($this->userSession, $this->generateGisToken($variables)),
                 ['query_hash' => static::FOLLOWS_QUERY_HASH]);
             if ($response->code !== 200) {
-                throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+                throw new InstagramException('Response code is ' . $response->code
+                    .'. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
             }
 
             $jsonResponse = json_decode($response->raw_body, true, 512, JSON_BIGINT_AS_STRING);
@@ -1420,7 +1438,7 @@ class Instagram
                 : strval($this->getMediaByUrl($media)->getId()))),
                 $this->generateHeaders($this->userSession));
 
-            if($response->code != 200)
+            if($response->code != static::HTTP_OK)
                 throw new InstagramException('Response code is ' . $response->code . '. Body: '
                     . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
         }
@@ -1433,7 +1451,7 @@ class Instagram
                     : strval($this->getAccount($account)->getId()))),
                 $this->generateHeaders($this->userSession));
 
-            if($response->code != 200)
+            if($response->code != static::HTTP_OK)
                 throw new InstagramException('Response code is ' . $response->code . '. Body: '
                     . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
         }
@@ -1446,7 +1464,7 @@ class Instagram
                 : strval($this->getAccount($account)->getId()))),
                 $this->generateHeaders($this->userSession));
 
-            if($response->code != 200)
+            if($response->code != static::HTTP_OK)
                 throw new InstagramException('Response code is ' . $response->code . '. Body: '
                     . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
         }
@@ -1470,5 +1488,9 @@ class Instagram
             $body = json_decode($response->raw_body, true);
             return new Comment($body['id'], $text, $body['created_time'], $body['from']['id'], $mediaId);
         }
+    }
+    
+    public function getSessionUsername(){
+        return $this->sessionUsername;
     }
 }
