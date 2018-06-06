@@ -281,7 +281,6 @@ class Instagram
      */
     public function getMedias($username, $count = 20, $maxId = '')
     {
-
         $account = $this->getAccount($username);
         return $this->getMediasByUserId($account->getId(), $count, $maxId);
     }
@@ -334,8 +333,7 @@ class Instagram
      * @return string
      * @throws InstagramException
      */
-    private function generateGisToken($variables)
-    {
+    private function generateGisToken($variables){
         return md5(implode(':', [$this->getRhxGis(), $variables ]));
     }
 
@@ -359,7 +357,7 @@ class Instagram
                 'after' => (string) $maxId
             ]);
 
-            $response = Request::get(Endpoints::getAccountMediasJsonLink($variables), $this->generateHeaders(null,
+            $response = Request::get(Endpoints::getAccountMediasJsonLink($variables), $this->generateHeaders( null,
                 $this->generateGisToken($variables)));
 
             if (static::HTTP_OK !== $response->code) {
@@ -919,22 +917,24 @@ class Instagram
     public function getCurrentTopMediasByLocationId($facebookLocationId)
     {
         $response = Request::get(Endpoints::getMediasJsonByLocationIdLink($facebookLocationId),
-            $this->generateHeaders($this->userSession));
+            null);
         if ($response->code === 404) {
             throw new InstagramNotFoundException('Location with this id doesn\'t exist');
         }
+
         if ($response->code !== 200) {
             throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
         }
         $cookies = static::parseCookies($response->headers['Set-Cookie']);
         $this->userSession['csrftoken'] = $cookies['csrftoken'];
         $jsonResponse = json_decode($response->raw_body, true, 512, JSON_BIGINT_AS_STRING);
-        $nodes = $jsonResponse['location']['top_posts']['nodes'];
+        $nodes = $jsonResponse['graphql']['location']['edge_location_to_top_posts']['edges'];
         $medias = [];
-        foreach ($nodes as $mediaArray) {
-            $medias[] = Media::create($mediaArray);
-        }
+
+        foreach ($nodes as $mediaArray)
+            $medias[] = Media::create($mediaArray['node']);
         return $medias;
+
     }
 
     /**
@@ -952,19 +952,21 @@ class Instagram
         $hasNext = true;
         while ($index < $quantity && $hasNext) {
             $response = Request::get(Endpoints::getMediasJsonByLocationIdLink($facebookLocationId, $offset),
-                $this->generateHeaders($this->userSession));
+                null);
             if ($response->code !== 200) {
                 throw new InstagramException('Response code is ' . $response->code . '. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
             }
             $cookies = static::parseCookies($response->headers['Set-Cookie']);
             $this->userSession['csrftoken'] = $cookies['csrftoken'];
             $arr = json_decode($response->raw_body, true, 512, JSON_BIGINT_AS_STRING);
-            $nodes = $arr['location']['media']['nodes'];
+            $nodes = $arr['graphql']['location']['edge_location_to_media']['edges'];
+
             foreach ($nodes as $mediaArray) {
                 if ($index === $quantity) {
                     return $medias;
                 }
-                $medias[] = Media::create($mediaArray);
+
+                $medias[] = Media::create($mediaArray['node']);
                 $index++;
             }
             if (empty($nodes)) {
@@ -1081,6 +1083,7 @@ class Instagram
      * @return array
      * @throws InstagramException
      */
+
     public function getFollowing($accountId, $count = 20, $pageSize = 20, $delayed = true)
     {
         if ($delayed) {
@@ -1099,13 +1102,13 @@ class Instagram
 
             $variables = json_encode([
                 'id' => (string) $accountId,
-                'first' => (string) $count,
+                'first' => (string) $pageSize,
                 'after' => (string) $endCursor
             ]);
 
             $response = Request::get(Endpoints::getFollowingJsonLink($accountId, $pageSize, $endCursor),
                 $this->generateHeaders($this->userSession, $this->generateGisToken($variables)),
-                ['query_hash' => static::FOLLOWS_QUERY_HASH]);
+                [ 'variables' => $variables]);
             if ($response->code !== 200) {
                 throw new InstagramException('Response code is ' . $response->code
                     .'. Body: ' . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
@@ -1492,5 +1495,13 @@ class Instagram
     
     public function getSessionUsername(){
         return $this->sessionUsername;
+    }
+
+    public function getLocationIdByName($locatioName){
+        $response = Request::get(Endpoints::getLocationIdUrl($locatioName));
+        $body = json_decode($response->raw_body, true);
+        $locationId = $body['places'][0]['place']['location']['pk'];
+
+        return $locationId;
     }
 }

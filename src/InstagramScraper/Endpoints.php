@@ -18,7 +18,7 @@ class Endpoints
     const COMMENTS_BEFORE_COMMENT_ID_BY_CODE = 'https://www.instagram.com/graphql/query/?query_id=17852405266163336&shortcode={{shortcode}}&first={{count}}&after={{commentId}}';
     const LAST_LIKES_BY_CODE = 'ig_shortcode({{code}}){likes{nodes{id,user{id,profile_pic_url,username,follows{count},followed_by{count},biography,full_name,media{count},is_private,external_url,is_verified}},page_info}}';
     const LIKES_BY_SHORTCODE = 'https://www.instagram.com/graphql/query/?query_id=17864450716183058&variables={"shortcode":"{{shortcode}}","first":{{count}},"after":"{{likeId}}"}';
-    const FOLLOWING_URL = 'https://www.instagram.com/graphql/query/?query_id=17874545323001329&id={{accountId}}&first={{count}}&after={{after}}';
+    //const FOLLOWING_URL = 'https://www.instagram.com/graphql/query/?query_id=17874545323001329&id={{accountId}}&first={{count}}&after={{after}}';
     const FOLLOWERS_URL = 'https://www.instagram.com/graphql/query/?query_id=17851374694183129&id={{accountId}}&first={{count}}&after={{after}}';
     const FOLLOW_URL = 'https://www.instagram.com/web/friendships/{{accountId}}/follow/';
     const UNFOLLOW_URL = 'https://www.instagram.com/web/friendships/{{accountId}}/unfollow/';
@@ -39,6 +39,8 @@ class Endpoints
     const MEDIA_LIKE_URL = 'https://www.instagram.com/web/likes/{{mediaId}}/like/';
     const MEDIA_UNLIKE_URL = 'https://www.instagram.com/web/likes/{{mediaId}}/unlike/';
     const COMMENT_URL = 'https://www.instagram.com/web/comments/{{mediaId}}/add/';
+    const LOCATION_ID_URL = 'https://www.instagram.com/web/search/topsearch/?context=blended&query={{locationName}}';
+    const FOLLOWING_URL = "https://www.instagram.com/graphql/query/?query_hash=58712303d941c6855d4e888c5f0cd22f";
 
     private static $requestMediaCount = 30;
 
@@ -201,5 +203,9 @@ class Endpoints
 
     public static function getCommentUrl($mediaId){
         return str_replace('{{mediaId}}', $mediaId, static::COMMENT_URL);
+    }
+
+    public static function getLocationIdUrl($locationName){
+        return str_replace('{{locationName}}', $locationName, static::LOCATION_ID_URL);
     }
 }
