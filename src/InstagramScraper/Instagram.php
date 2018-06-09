@@ -1492,6 +1492,22 @@ class Instagram
             return new Comment($body['id'], $text, $body['created_time'], $body['from']['id'], $mediaId);
         }
     }
+
+    public function deleteComment($media, $commentId){
+        if($media !== "" && $commentId !== ""){
+            $mediaId = (ctype_digit($media)
+                ? $media
+                : strval($this->getMediaByUrl($media)->getId()));
+
+
+            $response = Request::post(Endpoints::getDeleteCommentUrl($mediaId, $commentId),
+                $this->generateHeaders($this->userSession));
+
+            if($response->code != 200)
+                throw new InstagramException('Response code is ' . $response->code . '. Body: '
+                    . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
+        }
+    }
     
     public function getSessionUsername(){
         return $this->sessionUsername;

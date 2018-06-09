@@ -80,6 +80,7 @@ class Comment extends AbstractModel
                 break;
             case 'owner':
                 $this->owner = Account::create($value);
+                echo $this->owner->getUsername();
                 break;
         }
     }

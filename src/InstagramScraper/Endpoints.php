@@ -39,6 +39,7 @@ class Endpoints
     const MEDIA_LIKE_URL = 'https://www.instagram.com/web/likes/{{mediaId}}/like/';
     const MEDIA_UNLIKE_URL = 'https://www.instagram.com/web/likes/{{mediaId}}/unlike/';
     const COMMENT_URL = 'https://www.instagram.com/web/comments/{{mediaId}}/add/';
+    const DELETE_COMMENT_URL = "https://www.instagram.com/web/comments/{{mediaId}}/delete/{{commentId}}/";
     const LOCATION_ID_URL = 'https://www.instagram.com/web/search/topsearch/?context=blended&query={{locationName}}';
     const FOLLOWING_URL = "https://www.instagram.com/graphql/query/?query_hash=58712303d941c6855d4e888c5f0cd22f";
 
@@ -207,5 +208,10 @@ class Endpoints
 
     public static function getLocationIdUrl($locationName){
         return str_replace('{{locationName}}', $locationName, static::LOCATION_ID_URL);
+    }
+
+    public static function getDeleteCommentUrl($mediaId, $commentId){
+        $str = str_replace('{{mediaId}}', $mediaId, static::DELETE_COMMENT_URL);
+        return str_replace('{{commentId}}', $commentId, $str);
     }
 }
