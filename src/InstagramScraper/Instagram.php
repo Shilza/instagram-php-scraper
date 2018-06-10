@@ -1484,12 +1484,12 @@ class Instagram
                 $this->generateHeaders($this->userSession),
                 ['comment_text' => $text]);
 
-            if($response->code != 200)
+            if($response->code != static::HTTP_OK)
                 throw new InstagramException('Response code is ' . $response->code . '. Body: '
                     . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
 
             $body = json_decode($response->raw_body, true);
-            return new Comment($body['id'], $text, $body['created_time'], $body['from']['id'], $mediaId);
+            return new Comment($body['id'], $text, $body['created_time'], $body['from'], $mediaId);
         }
     }
 
@@ -1503,7 +1503,7 @@ class Instagram
             $response = Request::post(Endpoints::getDeleteCommentUrl($mediaId, $commentId),
                 $this->generateHeaders($this->userSession));
 
-            if($response->code != 200)
+            if($response->code != static::HTTP_OK)
                 throw new InstagramException('Response code is ' . $response->code . '. Body: '
                     . static::getErrorBody($response->body) . ' Something went wrong. Please report issue.');
         }

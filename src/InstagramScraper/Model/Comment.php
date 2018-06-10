@@ -80,11 +80,9 @@ class Comment extends AbstractModel
                 break;
             case 'owner':
                 $this->owner = Account::create($value);
-                echo $this->owner->getUsername();
                 break;
         }
     }
-
 
     ////
     protected $picId;
@@ -96,11 +94,19 @@ class Comment extends AbstractModel
         return $this->picId;
     }
 
+    /**
+     * Comment constructor.
+     * @param string $id
+     * @param string $text
+     * @param string $createdAt
+     * @param string $owner
+     * @param string $picId
+     */
     function __construct($id = "", $text = "", $createdAt = "", $owner = "", $picId = ""){
         $this->id = $id;
         $this->text = $text;
         $this->createdAt = $createdAt;
-        $this->owner = $owner;
+        $this->owner = Account::create($owner);
         $this->picId = $picId;
     }
 }
