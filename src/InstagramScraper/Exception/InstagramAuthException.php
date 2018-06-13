@@ -3,7 +3,6 @@
 namespace InstagramScraper\Exception;
 
 
-class InstagramAuthException extends \Exception
-{
+class InstagramAuthException extends Exception{
 
 }

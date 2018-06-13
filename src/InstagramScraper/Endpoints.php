@@ -95,7 +95,8 @@ class Endpoints
 
     public static function getMediasJsonByLocationIdLink($facebookLocationId, $maxId = '')
     {
-        $url = str_replace('{{facebookLocationId}}', urlencode($facebookLocationId), static::MEDIA_JSON_BY_LOCATION_ID);
+        $url = str_replace('{{facebookLocationId}}',
+            urlencode($facebookLocationId), static::MEDIA_JSON_BY_LOCATION_ID);
         return str_replace('{{maxId}}', urlencode($maxId), $url);
     }
 

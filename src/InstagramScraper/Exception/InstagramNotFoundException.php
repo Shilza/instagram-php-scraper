@@ -2,6 +2,5 @@
 
 namespace InstagramScraper\Exception;
 
-class InstagramNotFoundException extends \Exception
-{
+class InstagramNotFoundException extends Exception{
 }

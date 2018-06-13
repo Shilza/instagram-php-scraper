@@ -102,7 +102,7 @@ class Comment extends AbstractModel
      * @param string $owner
      * @param string $picId
      */
-    function __construct($id = "", $text = "", $createdAt = "", $owner = "", $picId = ""){
+    function __construct($id = "", $text = "", $createdAt = "", $owner = [], $picId = ""){
         $this->id = $id;
         $this->text = $text;
         $this->createdAt = $createdAt;
