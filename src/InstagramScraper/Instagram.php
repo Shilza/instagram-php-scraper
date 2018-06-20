@@ -1483,7 +1483,12 @@ class Instagram
         return self::extractSharedDataFromBody($response->raw_body);
     }
 
-
+    /**
+     * @param string $media
+     * @throws InstagramException
+     * @throws InstagramNotFoundException
+     * @throws InstagramRequestException
+     */
     public function like($media = ""){
         if ($media !== "") {
             $response = Request::post(Endpoints::getMediaLikeUrl((ctype_digit($media)
@@ -1499,6 +1504,12 @@ class Instagram
         }
     }
 
+    /**
+     * @param string $media
+     * @throws InstagramException
+     * @throws InstagramNotFoundException
+     * @throws InstagramRequestException
+     */
     public function unlike($media = ""){
         if ($media !== "") {
             $response = Request::post(Endpoints::getMediaUnlikeUrl((ctype_digit($media)
@@ -1514,6 +1525,12 @@ class Instagram
         }
     }
 
+    /**
+     * @param string $account
+     * @throws InstagramException
+     * @throws InstagramNotFoundException
+     * @throws InstagramRequestException
+     */
     public function follow($account = ""){
         if ($account !== "") {
             $response = Request::post(Endpoints::getFollowUrl((ctype_digit($account)
@@ -1529,6 +1546,12 @@ class Instagram
         }
     }
 
+    /**
+     * @param string $account
+     * @throws InstagramException
+     * @throws InstagramNotFoundException
+     * @throws InstagramRequestException
+     */
     public function unfollow($account = ""){
         if ($account !== "") {
             $response = Request::post(Endpoints::getUnfollowUrl((ctype_digit($account)
@@ -1544,6 +1567,14 @@ class Instagram
         }
     }
 
+    /**
+     * @param string $media
+     * @param string $text
+     * @return Comment
+     * @throws InstagramException
+     * @throws InstagramNotFoundException
+     * @throws InstagramRequestException
+     */
     public function comment($media = "", $text = ""){
         if($media !== "" && $text !== ""){
             $mediaId = (ctype_digit($media)
@@ -1566,12 +1597,18 @@ class Instagram
         }
     }
 
+    /**
+     * @param $media
+     * @param $commentId
+     * @throws InstagramException
+     * @throws InstagramNotFoundException
+     * @throws InstagramRequestException
+     */
     public function deleteComment($media, $commentId){
         if($media !== "" && $commentId !== ""){
             $mediaId = (ctype_digit($media)
                 ? $media
                 : strval($this->getMediaByUrl($media)->getId()));
-
 
             $response = Request::post(Endpoints::getDeleteCommentUrl($mediaId, $commentId),
                 $this->generateHeaders($this->userSession));
@@ -1583,11 +1620,18 @@ class Instagram
                 $response->code);
         }
     }
-    
+
+    /**
+     * @return mixed
+     */
     public function getSessionUsername(){
         return $this->sessionUsername;
     }
 
+    /**
+     * @param $locatioName
+     * @return mixed
+     */
     public function getLocationIdByName($locatioName){
         $response = Request::get(Endpoints::getLocationIdUrl($locatioName));
         $body = json_decode($response->raw_body, true);
